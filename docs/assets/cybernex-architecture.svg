@@ -69,12 +69,13 @@
 
     <rect x="450" y="390" width="170" height="90" rx="8" fill="#0f172a" stroke="#38bdf8"/>
     <text x="535" y="420" fill="#f8fafc" text-anchor="middle">Docker Sandbox</text>
-    <text x="535" y="440" fill="#94a3b8" font-size="10" font-weight="500" text-anchor="middle">Isolated Subprocess</text>
+    <text x="535" y="440" fill="#94a3b8" font-size="10" font-weight="500" text-anchor="middle">Isolated Container</text>
     <text x="535" y="455" fill="#94a3b8" font-size="10" font-weight="500" text-anchor="middle">Memory &amp; Network Bounds</text>
 
     <rect x="640" y="390" width="190" height="90" rx="8" fill="#0f172a" stroke="#38bdf8"/>
     <text x="735" y="420" fill="#f8fafc" text-anchor="middle">Document &amp; OCR Engine</text>
-    <text x="735" y="440" fill="#94a3b8" font-size="10" font-weight="500" text-anchor="middle">PyMuPDF / Tesseract</text>
+    <text x="735" y="440" fill="#94a3b8" font-size="10" font-weight="500" text-anchor="middle">PyMuPDF / PaddleOCR</text>
     <text x="735" y="455" fill="#94a3b8" font-size="10" font-weight="500" text-anchor="middle">python-docx / openpyxl</text>
+
   </g>
 </svg>
