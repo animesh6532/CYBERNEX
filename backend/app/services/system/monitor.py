@@ -4,7 +4,7 @@ from app.schemas.security import SystemMetricsSchema
 
 
 class SystemMonitorService:
-    def get_status((self)) -> SystemMetricsSchema:
+    def get_status(self) -> SystemMetricsSchema:
         """
         Returns real-time system hardware metrics (CPU, Memory, Disk, GPU).
         """
