@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, Code, History } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -7,13 +7,15 @@ import { CodingDemoModal } from '@/components/ui/CodingDemoModal';
 import { TaskComposer } from '@/components/workbench/TaskComposer';
 import { RecentWork } from '@/components/workbench/RecentWork';
 import { useApp } from '@/context/AppContext';
+import { api } from '@/lib/api';
 import { UploadedFile } from '@/types';
 
 export const WorkbenchPage: React.FC = () => {
   const navigate = useNavigate();
-  const { activeTask, runAgentSimulation, showToast } = useApp();
+  const { createTask, showToast } = useApp();
 
   const [prompt, setPrompt] = useState<string>('');
+  const [rawFiles, setRawFiles] = useState<File[]>([]);
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [selectedModel, setSelectedModel] = useState<string>('Auto');
   const [selectedTools, setSelectedTools] = useState<string[]>([
@@ -22,8 +24,16 @@ export const WorkbenchPage: React.FC = () => {
     'Documents',
   ]);
 
+  const [recentTasksList, setRecentTasksList] = useState<any[]>([]);
+
   const [multimodalModalOpen, setMultimodalModalOpen] = useState<boolean>(false);
   const [codingModalOpen, setCodingModalOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    api.getTasks().then(tasks => {
+      setRecentTasksList(tasks.slice(0, 5));
+    }).catch(() => setRecentTasksList([]));
+  }, []);
 
   const handleToolToggle = (toolId: string) => {
     if (selectedTools.includes(toolId)) {
@@ -35,6 +45,8 @@ export const WorkbenchPage: React.FC = () => {
 
   const handleAddFiles = (uploadedFiles: FileList | File[]) => {
     const fileArray = Array.from(uploadedFiles);
+    setRawFiles(prev => [...prev, ...fileArray]);
+
     const newFiles: UploadedFile[] = fileArray.map((f, i) => {
       const extension = f.name.split('.').pop()?.toUpperCase();
       let type: UploadedFile['type'] = 'PDF';
@@ -43,11 +55,11 @@ export const WorkbenchPage: React.FC = () => {
       else if (['PNG', 'JPG', 'JPEG', 'WEBP'].includes(extension || '')) type = 'IMAGE';
 
       return {
-        id: `file-${Date.now()}-${i}`,
+        id: `file-temp-${Date.now()}-${i}`,
         name: f.name,
         size: `${(f.size / (1024 * 1024)).toFixed(1)} MB`,
         type,
-        pages: 5,
+        pages: 1,
         status: 'Ready',
       };
     });
@@ -60,17 +72,27 @@ export const WorkbenchPage: React.FC = () => {
     setFiles(files.filter((f) => f.id !== fileId));
   };
 
-  const handleRunTask = () => {
+  const handleRunTask = async () => {
     if (!prompt.trim()) {
       showToast('Describe your task first.');
       return;
     }
-    const runId = runAgentSimulation(prompt, selectedModel, selectedTools, files);
-    navigate(`/runs/${runId}`);
-  };
 
-  // Check if activeTask contains a run to list in RecentWork
-  const recentTasksList = activeTask && activeTask.prompt ? [activeTask] : [];
+    try {
+      const fileIds: string[] = [];
+      for (const rf of rawFiles) {
+        const upRes = await api.uploadFile(rf);
+        if (upRes && upRes.id) {
+          fileIds.push(upRes.id);
+        }
+      }
+
+      const res = await createTask(prompt, selectedModel, selectedTools, fileIds);
+      navigate(`/runs/${res.run_id}`);
+    } catch (err: any) {
+      showToast(`Task creation failed: ${err.message || err}`);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 font-sans pb-12">
@@ -85,7 +107,6 @@ export const WorkbenchPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Optional Right-Side Action: Recent Runs link */}
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
@@ -98,7 +119,7 @@ export const WorkbenchPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Task Composer (~60-70% visual focus) */}
+      {/* Main Task Composer */}
       <TaskComposer
         prompt={prompt}
         setPrompt={setPrompt}

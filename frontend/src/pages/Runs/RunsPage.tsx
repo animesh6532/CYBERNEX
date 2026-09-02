@@ -1,46 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, History } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { useApp } from '@/context/AppContext';
+import { api } from '@/lib/api';
 
 export const RunsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { activeTask } = useApp();
+  const [runs, setRuns] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [filter, setFilter] = useState<'ALL' | 'COMPLETED' | 'RUNNING' | 'FAILED'>('ALL');
 
-  const historyRuns = [
-    {
-      id: activeTask.id,
-      prompt: activeTask.prompt,
-      model: activeTask.selectedModel,
-      tools: activeTask.selectedTools.join(', '),
-      status: activeTask.status === 'running' ? 'RUNNING' : 'COMPLETED',
-      duration: activeTask.duration || '18.4s',
-      time: activeTask.createdAt,
-    },
-    {
-      id: 'run-7104-cx',
-      prompt: 'Execute sandboxed Python equipment efficiency calculation',
-      model: 'Coding (Qwen2.5-Coder-32B)',
-      tools: 'CODE_EXECUTION, FILE_OPERATIONS',
-      status: 'COMPLETED',
-      duration: '4.2s',
-      time: '2026-09-02 11:30:12',
-    },
-    {
-      id: 'run-6091-cx',
-      prompt: 'Multimodal vision scan of plant P&ID schematic diagram',
-      model: 'Vision (Llama-3.2-Vision)',
-      tools: 'OCR, KNOWLEDGE_BASE',
-      status: 'COMPLETED',
-      duration: '12.1s',
-      time: '2026-09-01 16:45:00',
-    },
-  ];
+  useEffect(() => {
+    api.getTasks()
+      .then((data) => setRuns(data))
+      .catch((err) => console.error('Error fetching runs:', err))
+      .finally(() => setLoading(false));
+  }, []);
 
-  const filteredRuns = historyRuns.filter((r) => filter === 'ALL' || r.status === filter);
+  const filteredRuns = runs.filter((r) => {
+    if (filter === 'ALL') return true;
+    const st = (r.status || '').toUpperCase();
+    return st === filter;
+  });
 
   return (
     <div className="space-y-8 font-sans max-w-5xl mx-auto">
@@ -50,7 +33,7 @@ export const RunsPage: React.FC = () => {
             Runs
           </h2>
           <p className="text-xs text-sky-800 font-medium mt-0.5">
-            View your recent tasks.
+            View your recent agent execution tasks.
           </p>
         </div>
 
@@ -71,48 +54,63 @@ export const RunsPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="glass-panel rounded-2xl border border-sky-200 overflow-hidden shadow-xs">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="border-b border-sky-200 text-sky-900 font-black uppercase">
-              <tr>
-                <th className="p-4">Task</th>
-                <th className="p-4">Model</th>
-                <th className="p-4">Status</th>
-                <th className="p-4">Duration</th>
-                <th className="p-4">Date</th>
-                <th className="p-4 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-sky-100 font-medium">
-              {filteredRuns.map((run) => (
-                <tr
-                  key={run.id}
-                  onClick={() => navigate(`/runs/${run.id}`)}
-                  className="hover:bg-white/60 cursor-pointer transition-colors"
-                >
-                  <td className="p-4 text-sky-950 font-bold max-w-xs truncate">{run.prompt}</td>
-                  <td className="p-4 text-sky-900 font-bold">{run.model}</td>
-                  <td className="p-4">
-                    <StatusBadge status={run.status as any} size="sm" />
-                  </td>
-                  <td className="p-4 text-sky-800 font-bold">{run.duration}</td>
-                  <td className="p-4 text-sky-700 font-medium">{run.time}</td>
-                  <td className="p-4 text-right">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      icon={<ArrowRight className="w-3.5 h-3.5 text-sky-600" />}
-                    >
-                      View
-                    </Button>
-                  </td>
+      {loading ? (
+        <div className="p-8 text-center text-xs text-sky-700 font-bold">Loading execution runs...</div>
+      ) : filteredRuns.length > 0 ? (
+        <div className="glass-panel rounded-2xl border border-sky-200 overflow-hidden shadow-xs">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="border-b border-sky-200 text-sky-900 font-black uppercase">
+                <tr>
+                  <th className="p-4">Task Prompt</th>
+                  <th className="p-4">Model</th>
+                  <th className="p-4">Status</th>
+                  <th className="p-4">Date</th>
+                  <th className="p-4 text-right">Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-sky-100 font-medium">
+                {filteredRuns.map((run) => (
+                  <tr
+                    key={run.id || run.run_id}
+                    onClick={() => navigate(`/runs/${run.run_id || run.id}`)}
+                    className="hover:bg-white/60 cursor-pointer transition-colors"
+                  >
+                    <td className="p-4 text-sky-950 font-bold max-w-xs truncate">{run.prompt}</td>
+                    <td className="p-4 text-sky-900 font-bold">{run.selectedModel || 'Auto'}</td>
+                    <td className="p-4">
+                      <StatusBadge status={(run.status || 'COMPLETED').toUpperCase()} size="sm" />
+                    </td>
+                    <td className="p-4 text-sky-700 font-medium">{run.createdAt || 'Just now'}</td>
+                    <td className="p-4 text-right">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        icon={<ArrowRight className="w-3.5 h-3.5 text-sky-600" />}
+                      >
+                        View
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      ) : (
+        <GlassCard className="p-12 text-center space-y-4 border-sky-300">
+          <History className="w-12 h-12 text-sky-500 mx-auto opacity-60" />
+          <div className="space-y-1">
+            <h3 className="text-base font-black text-[#0C4A6E]">No runs yet.</h3>
+            <p className="text-xs text-sky-800 font-medium">
+              Create a task in the Workbench to see execution history.
+            </p>
+          </div>
+          <Button variant="primary" size="md" onClick={() => navigate('/workbench')}>
+            Go to Workbench
+          </Button>
+        </GlassCard>
+      )}
     </div>
   );
 };

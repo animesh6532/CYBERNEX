@@ -15,21 +15,14 @@ def extract_ocr(req: OCRExtractRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="file_id is required for OCR extraction.")
 
     db_file = db.query(models.TaskFile).filter(models.TaskFile.id == req.file_id).first()
-    file_path = db_file.file_path if db_file else None
+    if not db_file or not db_file.file_path:
+        raise HTTPException(status_code=404, detail="Requested file record or path not found.")
 
-    if not file_path:
-        # Fallback dummy OCR for demonstration
-        return OCRExtractResponse(
-            text="[OCR Telemetry Extraction]: Pressure gauge reading 154.2 PSI on Turbine Unit #4.",
-            pages=1,
-            confidence=0.96,
-            source_file_id=req.file_id
-        )
-
-    res = ocr_service.extract_text(file_path, language=req.language)
+    res = ocr_service.extract_text(db_file.file_path)
     return OCRExtractResponse(
         text=res.get("text", ""),
         pages=res.get("pages", 1),
         confidence=res.get("confidence", 0.90),
         source_file_id=req.file_id
     )
+

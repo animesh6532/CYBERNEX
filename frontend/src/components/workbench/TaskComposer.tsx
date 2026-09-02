@@ -44,13 +44,14 @@ export const TaskComposer: React.FC<TaskComposerProps> = ({
   };
 
   const sampleSuggestion =
-    'Analyze an inspection report and prepare an approval note.';
+    'Analyze document findings and prepare an executive summary report.';
 
   const handleApplySuggestion = () => {
     setPrompt(
-      'Analyze the inspection report, compare findings against SOP-704, and prepare an approval note.'
+      'Analyze the uploaded document, identify key metrics and deviations, and prepare an executive report.'
     );
   };
+
 
   return (
     <div
