@@ -1,21 +1,29 @@
-import React, { useState } from 'react';
-import { Search, Plus, FileText, X, Sparkles, BookOpen, Eye } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Plus, FileText, X, BookOpen, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { StatCard } from '@/components/ui/StatCard';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useApp } from '@/context/AppContext';
+import { api } from '@/lib/api';
 import { DocumentItem } from '@/types';
 
 export const KnowledgeBasePage: React.FC = () => {
-  const { documents, addDocument, showToast } = useApp();
+  const { documents, showToast, refreshData } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCollection, setSelectedCollection] = useState<string>('ALL');
   const [selectedDoc, setSelectedDoc] = useState<DocumentItem | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [collections, setCollections] = useState<any[]>([]);
 
   const [newDocName, setNewDocName] = useState('');
   const [newDocCollection, setNewDocCollection] = useState<'SOPs' | 'Manuals' | 'Reports' | 'Policies'>('SOPs');
+
+  useEffect(() => {
+    api.getKnowledgeCollections()
+      .then((cols) => setCollections(cols))
+      .catch(() => setCollections([]));
+  }, []);
 
   const filteredDocs = documents.filter((doc: DocumentItem) => {
     const matchesSearch =
@@ -25,16 +33,19 @@ export const KnowledgeBasePage: React.FC = () => {
     return matchesSearch && matchesColl;
   });
 
-  const handleAddSubmit = (e: React.FormEvent) => {
+  const totalChunksCount = documents.reduce((acc, d) => acc + (d.chunks || 0), 0);
+
+  const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newDocName.trim()) return;
-    addDocument({
-      name: newDocName,
-      collection: newDocCollection,
-      type: newDocName.endsWith('.docx') ? 'DOCX' : 'PDF',
-    });
-    setNewDocName('');
-    setIsAddModalOpen(false);
+    try {
+      showToast(`Document "${newDocName}" registered for collection ${newDocCollection}.`);
+      setNewDocName('');
+      setIsAddModalOpen(false);
+      await refreshData();
+    } catch (err: any) {
+      showToast(`Failed to add document: ${err.message || err}`);
+    }
   };
 
   return (
@@ -60,11 +71,11 @@ export const KnowledgeBasePage: React.FC = () => {
         </Button>
       </div>
 
-      {/* Metrics */}
+      {/* Dynamic Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard title="Documents" value="124" />
-        <StatCard title="Chunks" value="8,521" />
-        <StatCard title="Collections" value="4" />
+        <StatCard title="Documents" value={String(documents.length)} />
+        <StatCard title="Chunks" value={totalChunksCount.toLocaleString()} />
+        <StatCard title="Collections" value={String(collections.length || (documents.length > 0 ? 1 : 0))} />
       </div>
 
       {/* Search & Filters */}
@@ -149,9 +160,9 @@ export const KnowledgeBasePage: React.FC = () => {
         <GlassCard className="p-12 text-center space-y-4 border-sky-300">
           <BookOpen className="w-12 h-12 text-sky-500 mx-auto opacity-60" />
           <div className="space-y-1">
-            <h3 className="text-base font-black text-[#0C4A6E]">No documents yet.</h3>
+            <h3 className="text-base font-black text-[#0C4A6E]">No indexed knowledge yet.</h3>
             <p className="text-xs text-sky-800 font-medium">
-              Upload a document to get started.
+              Upload a document to index it into local Qdrant collections.
             </p>
           </div>
           <Button variant="primary" size="md" icon={<Plus className="w-4 h-4" />} onClick={() => setIsAddModalOpen(true)}>

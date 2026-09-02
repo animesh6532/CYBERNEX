@@ -1,17 +1,23 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Cpu, Database, Terminal, Shield, User } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { StatCard } from '@/components/ui/StatCard';
 import { useApp } from '@/context/AppContext';
+import { api } from '@/lib/api';
 
 export const SecurityPage: React.FC = () => {
-  const { systemMetrics } = useApp();
+  const { security, systemMetrics } = useApp();
+  const [events, setEvents] = useState<any[]>([]);
+
+  useEffect(() => {
+    api.getSecurityEvents().then(setEvents).catch(() => setEvents([]));
+  }, []);
 
   const capabilities = [
-    { title: 'Local models', desc: 'Models run locally.', icon: Cpu },
-    { title: 'Private knowledge', desc: 'Your data stays on your system.', icon: Database },
-    { title: 'Sandboxed code', desc: 'Code runs inside isolated containers.', icon: Terminal },
-    { title: 'Controlled network', desc: 'Network activity is verifiable.', icon: ShieldCheck },
+    { title: 'Local models', desc: 'Models executed locally via Ollama HTTP API.', icon: Cpu },
+    { title: 'Private knowledge', desc: 'Vector database stored locally on Qdrant.', icon: Database },
+    { title: 'Sandboxed code', desc: 'Code isolated in Docker container with network disabled.', icon: Terminal },
+    { title: 'Controlled network', desc: 'Inbound & outbound sockets monitored.', icon: ShieldCheck },
   ];
 
   return (
@@ -20,35 +26,35 @@ export const SecurityPage: React.FC = () => {
       <div className="flex items-center justify-between pb-2 border-b border-sky-200">
         <div>
           <h2 className="text-3xl font-black text-[#0C4A6E] tracking-tight">
-            Security
+            Security Telemetry
           </h2>
           <p className="text-xs text-sky-800 font-medium mt-0.5">
-            See how your data is protected.
+            Real-time zero-cloud isolation status and event audit log.
           </p>
         </div>
 
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-800 font-bold text-xs shadow-xs">
-          <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          <span>System secure</span>
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-50 border border-sky-300 text-sky-900 font-bold text-xs shadow-xs">
+          <ShieldCheck className="w-4 h-4 text-sky-600" />
+          <span>{security.airGapStatus || 'LOCAL ONLY'}</span>
         </div>
       </div>
 
       {/* 4 Clean Glass Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="External AI calls" value="0" />
-        <StatCard title="Cloud model calls" value="0" />
-        <StatCard title="External connections" value="0" />
-        <StatCard title="Data sent outside" value="0 B" />
+        <StatCard title="External AI calls" value={String(security.externalApiCount ?? 0)} />
+        <StatCard title="Cloud LLM calls" value={String(security.cloudLlmCalls ?? 0)} />
+        <StatCard title="External connections" value={String(security.externalConnections ?? 0)} />
+        <StatCard title="Data sent outside" value={`${security.dataLeavingMachine ?? 0} B`} />
       </div>
 
-      {/* Security Visualization */}
+      {/* Security Architecture Flow */}
       <GlassCard gradient className="p-8 space-y-6 border-sky-300 text-center">
         <div className="flex flex-col items-center justify-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-100 border border-emerald-300 text-emerald-700 flex items-center justify-center shadow-xs">
+          <div className="w-12 h-12 rounded-2xl bg-sky-100 border border-sky-300 text-sky-700 flex items-center justify-center shadow-xs">
             <ShieldCheck className="w-7 h-7" />
           </div>
-          <h3 className="text-lg font-black text-[#0C4A6E]">System secure</h3>
-          <p className="text-xs text-sky-800 font-bold uppercase tracking-wider">LOCAL INFRASTRUCTURE</p>
+          <h3 className="text-lg font-black text-[#0C4A6E]">Local Telemetry Active</h3>
+          <p className="text-xs text-sky-800 font-bold uppercase tracking-wider">LOCAL INFRASTRUCTURE STATUS</p>
         </div>
 
         {/* Visual Connection Flow */}
@@ -62,20 +68,16 @@ export const SecurityPage: React.FC = () => {
           </span>
           <span className="text-sky-400">→</span>
           <span className="px-3.5 py-2 rounded-xl bg-white/80 border border-sky-200 shadow-xs flex items-center gap-1.5">
-            <Cpu className="w-3.5 h-3.5 text-sky-600" /> Local Models
+            <Cpu className="w-3.5 h-3.5 text-sky-600" /> Local Ollama
           </span>
           <span className="text-sky-400">→</span>
           <span className="px-3.5 py-2 rounded-xl bg-white/80 border border-sky-200 shadow-xs flex items-center gap-1.5">
-            <Database className="w-3.5 h-3.5 text-sky-600" /> Local Knowledge
-          </span>
-          <span className="text-sky-400">→</span>
-          <span className="px-3.5 py-2 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800 shadow-xs flex items-center gap-1.5">
-            Local Output
+            <Database className="w-3.5 h-3.5 text-sky-600" /> Local Qdrant
           </span>
         </div>
       </GlassCard>
 
-      {/* 4 Compact Capabilities Cards */}
+      {/* Capabilities Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {capabilities.map((cap, idx) => {
           const Icon = cap.icon;
@@ -91,28 +93,25 @@ export const SecurityPage: React.FC = () => {
         })}
       </div>
 
-      {/* System Monitor */}
+      {/* Security Audit Events List */}
       <GlassCard className="p-6 space-y-4 border-sky-300">
-        <h3 className="text-xs font-bold text-sky-900 uppercase">System Monitor</h3>
+        <h3 className="text-xs font-bold text-sky-900 uppercase">Recorded Security Events</h3>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 font-sans text-xs">
-          {[
-            { label: 'GPU', val: `${systemMetrics.gpuUsage}%` },
-            { label: 'CPU', val: `${systemMetrics.cpuUsage}%` },
-            { label: 'Memory', val: `${systemMetrics.memoryUsage}%` },
-            { label: 'Storage', val: `${systemMetrics.storageUsage}%` },
-          ].map((item, i) => (
-            <div key={i} className="space-y-1.5">
-              <div className="flex justify-between font-black text-[#0C4A6E]">
-                <span>{item.label}</span>
-                <span>{item.val}</span>
+        {events.length > 0 ? (
+          <div className="space-y-2">
+            {events.map((evt) => (
+              <div key={evt.id} className="p-3 rounded-xl bg-white/70 border border-sky-200 flex items-center justify-between text-xs font-medium">
+                <div>
+                  <span className="font-bold text-[#0C4A6E] mr-2">[{evt.event_type}]</span>
+                  <span className="text-sky-900">{evt.details}</span>
+                </div>
+                <span className="text-sky-700 font-mono text-[10px]">{evt.timestamp}</span>
               </div>
-              <div className="w-full h-1.5 rounded-full bg-sky-100 border border-sky-200 overflow-hidden">
-                <div className="h-full bg-sky-500 rounded-full" style={{ width: item.val }} />
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-xs text-sky-800 font-medium italic">No security audit events recorded.</div>
+        )}
       </GlassCard>
     </div>
   );
