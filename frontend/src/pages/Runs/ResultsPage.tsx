@@ -1,24 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   CheckCircle2,
-  AlertTriangle,
   FileText,
   Download,
-  FileSpreadsheet,
-  FileCode,
   Eye,
-  BookOpen,
 } from 'lucide-react';
-import { Button } from '../components/ui/Button';
-import { GlassCard } from '../components/ui/GlassCard';
-import { useApp } from '../context/AppContext';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { useApp } from '@/context/AppContext';
+import { Finding, Citation, Deliverable } from '@/types';
 
 export const ResultsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { activeTask, showToast } = useApp();
-  const [selectedCitation, setSelectedCitation] = useState<string | null>(null);
 
   return (
     <div className="space-y-8 font-sans max-w-5xl mx-auto">
@@ -77,7 +73,7 @@ export const ResultsPage: React.FC = () => {
             <h3 className="text-xs font-bold text-sky-900 uppercase">Identified Findings</h3>
 
             <div className="space-y-3">
-              {activeTask.findings.map((finding, idx) => (
+              {activeTask.findings.map((finding: Finding, idx: number) => (
                 <div key={finding.id} className="glass-panel p-4 rounded-2xl border border-sky-200 space-y-2">
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-black text-[#0C4A6E]">
@@ -101,7 +97,7 @@ export const ResultsPage: React.FC = () => {
             <h3 className="text-xs font-bold text-sky-900 uppercase">Sources & Evidence</h3>
 
             <div className="space-y-3">
-              {activeTask.citations.map((citation) => (
+              {activeTask.citations.map((citation: Citation) => (
                 <GlassCard key={citation.id} hoverEffect className="p-5 space-y-3 border-sky-300">
                   <div className="flex items-center justify-between text-xs border-b border-sky-200 pb-2">
                     <span className="font-black text-[#0C4A6E]">{citation.sourceName}</span>
@@ -139,8 +135,7 @@ export const ResultsPage: React.FC = () => {
           <h3 className="text-xs font-bold text-sky-900 uppercase">Generated Deliverables</h3>
 
           <div className="space-y-3">
-            {activeTask.deliverables.map((del) => {
-              const isDocx = del.type === 'DOCX';
+            {activeTask.deliverables.map((del: Deliverable) => {
               return (
                 <GlassCard key={del.id} gradient className="p-5 space-y-3 border-sky-300">
                   <div className="flex items-center justify-between">

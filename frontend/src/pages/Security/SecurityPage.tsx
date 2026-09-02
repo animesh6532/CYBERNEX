@@ -1,8 +1,8 @@
 import React from 'react';
 import { ShieldCheck, Cpu, Database, Terminal, Shield, User } from 'lucide-react';
-import { GlassCard } from '../components/ui/GlassCard';
-import { StatCard } from '../components/ui/StatCard';
-import { useApp } from '../context/AppContext';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { StatCard } from '@/components/ui/StatCard';
+import { useApp } from '@/context/AppContext';
 
 export const SecurityPage: React.FC = () => {
   const { systemMetrics } = useApp();

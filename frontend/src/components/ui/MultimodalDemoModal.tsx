@@ -1,6 +1,6 @@
 import React from 'react';
-import { X, Eye, Cpu, CheckCircle2, ShieldCheck, FileImage } from 'lucide-react';
-import { Button } from '../ui/Button';
+import { X, Eye, CheckCircle2, FileImage } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 interface MultimodalDemoModalProps {
   isOpen: boolean;
@@ -11,7 +11,7 @@ export const MultimodalDemoModal: React.FC<MultimodalDemoModalProps> = ({ isOpen
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sky-950/20 backdrop-blur-md animate-in fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sky-950/20 backdrop-blur-md animate-in fade-in font-sans">
       <div className="w-full max-w-4xl rounded-2xl glass-panel border border-sky-300 p-6 space-y-6 shadow-2xl relative bg-white/95">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-sky-200">
@@ -22,11 +22,11 @@ export const MultimodalDemoModal: React.FC<MultimodalDemoModalProps> = ({ isOpen
             <div>
               <h3 className="text-base font-black text-[#0C4A6E] flex items-center gap-2">
                 P&ID Engineering Diagram Analysis
-                <span className="text-[10px] font-mono bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-300 font-bold">
+                <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-300 font-bold">
                   ● LOCAL VISION INFERENCE
                 </span>
               </h3>
-              <p className="text-xs text-sky-800 font-mono">
+              <p className="text-xs text-sky-800 font-medium mt-0.5">
                 Model: Local Llama-3.2-Vision-11B • Air-Gapped Sandbox
               </p>
             </div>
@@ -43,7 +43,7 @@ export const MultimodalDemoModal: React.FC<MultimodalDemoModalProps> = ({ isOpen
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* SVG P&ID Diagram */}
           <div className="rounded-2xl bg-sky-50/70 border border-sky-200 p-4 flex flex-col items-center justify-center relative overflow-hidden">
-            <div className="w-full flex items-center justify-between text-[10px] font-mono text-sky-800 font-bold mb-3">
+            <div className="w-full flex items-center justify-between text-[10px] font-bold text-sky-800 mb-3">
               <span className="flex items-center gap-1"><FileImage className="w-3.5 h-3.5 text-sky-600" /> SCHEMATIC_PND_704.SVG</span>
               <span>100% AIR-GAPPED</span>
             </div>
@@ -60,20 +60,20 @@ export const MultimodalDemoModal: React.FC<MultimodalDemoModalProps> = ({ isOpen
 
                 <circle cx="90" cy="120" r="22" fill="#E0F2FE" stroke="#0284C7" strokeWidth="2" />
                 <path d="M 90 98 L 108 120 L 90 142 Z" fill="#0369A1" />
-                <text x="90" y="156" fill="#0C4A6E" fontSize="10" fontFamily="JetBrains Mono" fontWeight="bold" textAnchor="middle">P-101 (Pump)</text>
+                <text x="90" y="156" fill="#0C4A6E" fontSize="10" fontFamily="Inter" fontWeight="bold" textAnchor="middle">P-101 (Pump)</text>
 
                 <polygon points="190,50 210,70 190,70 210,50" fill="#0EA5E9" stroke="#0284C7" strokeWidth="1.5" />
-                <text x="200" y="42" fill="#0C4A6E" fontSize="10" fontFamily="JetBrains Mono" fontWeight="bold" textAnchor="middle">V-204 (Valve)</text>
+                <text x="200" y="42" fill="#0C4A6E" fontSize="10" fontFamily="Inter" fontWeight="bold" textAnchor="middle">V-204 (Valve)</text>
 
                 <circle cx="310" cy="120" r="14" fill="#FEF3C7" stroke="#D97706" strokeWidth="2" className="animate-pulse" />
-                <text x="310" y="124" fill="#92400E" fontSize="9" fontFamily="JetBrains Mono" fontWeight="bold" textAnchor="middle">PI-70</text>
-                <text x="310" y="148" fill="#0C4A6E" fontSize="9" fontFamily="JetBrains Mono" fontWeight="bold" textAnchor="middle">154.2 PSI</text>
+                <text x="310" y="124" fill="#92400E" fontSize="9" fontFamily="Inter" fontWeight="bold" textAnchor="middle">PI-70</text>
+                <text x="310" y="148" fill="#0C4A6E" fontSize="9" fontFamily="Inter" fontWeight="bold" textAnchor="middle">154.2 PSI</text>
               </svg>
             </div>
           </div>
 
           {/* Detections List */}
-          <div className="space-y-4 font-mono text-xs">
+          <div className="space-y-4 text-xs font-sans">
             <div className="text-sky-900 font-extrabold uppercase tracking-wider">Vision Model Detection Results</div>
 
             <div className="space-y-2">

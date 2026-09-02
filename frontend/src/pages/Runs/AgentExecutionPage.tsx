@@ -8,9 +8,10 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
-import { Button } from '../components/ui/Button';
-import { StatusBadge } from '../components/ui/StatusBadge';
-import { useApp } from '../context/AppContext';
+import { Button } from '@/components/ui/Button';
+import { StatusBadge } from '@/components/ui/StatusBadge';
+import { useApp } from '@/context/AppContext';
+import { WorkflowStep, LogEntry } from '@/types';
 
 export const AgentExecutionPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -56,7 +57,7 @@ export const AgentExecutionPage: React.FC = () => {
           </div>
 
           <div className="space-y-3 relative before:absolute before:top-4 before:bottom-4 before:left-5 before:w-[2px] before:bg-sky-200">
-            {activeTask.steps.map((step) => {
+            {activeTask.steps.map((step: WorkflowStep) => {
               const isCompleted = step.status === 'completed';
               const isInProgress = step.status === 'in_progress';
 
@@ -123,7 +124,7 @@ export const AgentExecutionPage: React.FC = () => {
                   <span className="text-emerald-400">LOCAL</span>
                 </div>
 
-                {activeTask.logs.map((log) => (
+                {activeTask.logs.map((log: LogEntry) => (
                   <div
                     key={log.id}
                     className="p-2 rounded-lg bg-slate-800/60 text-[11px] leading-relaxed font-medium"

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Search, Plus, FileText, X, Sparkles, BookOpen, Eye } from 'lucide-react';
-import { Button } from '../components/ui/Button';
-import { GlassCard } from '../components/ui/GlassCard';
-import { StatCard } from '../components/ui/StatCard';
-import { StatusBadge } from '../components/ui/StatusBadge';
-import { useApp } from '../context/AppContext';
-import { DocumentItem } from '../types';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { StatCard } from '@/components/ui/StatCard';
+import { StatusBadge } from '@/components/ui/StatusBadge';
+import { useApp } from '@/context/AppContext';
+import { DocumentItem } from '@/types';
 
 export const KnowledgeBasePage: React.FC = () => {
   const { documents, addDocument, showToast } = useApp();
@@ -17,7 +17,7 @@ export const KnowledgeBasePage: React.FC = () => {
   const [newDocName, setNewDocName] = useState('');
   const [newDocCollection, setNewDocCollection] = useState<'SOPs' | 'Manuals' | 'Reports' | 'Policies'>('SOPs');
 
-  const filteredDocs = documents.filter((doc) => {
+  const filteredDocs = documents.filter((doc: DocumentItem) => {
     const matchesSearch =
       doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       doc.previewText?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -113,7 +113,7 @@ export const KnowledgeBasePage: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-sky-100 font-medium">
-                {filteredDocs.map((doc) => (
+                {filteredDocs.map((doc: DocumentItem) => (
                   <tr key={doc.id} className="hover:bg-white/60 transition-colors">
                     <td className="p-4 font-black text-[#0C4A6E] flex items-center gap-2">
                       <FileText className="w-4 h-4 text-sky-600 shrink-0" />

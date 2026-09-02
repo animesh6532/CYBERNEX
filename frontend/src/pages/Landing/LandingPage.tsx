@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
-import { CyberLogo } from '../components/ui/CyberLogo';
-import { Button } from '../components/ui/Button';
+import { CyberLogo } from '@/components/ui/CyberLogo';
+import { Button } from '@/components/ui/Button';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -59,79 +59,23 @@ export const LandingPage: React.FC = () => {
           </div>
         </section>
 
-        {/* 2. Brand Statement */}
-        <section className="py-8">
-          <div className="p-8 rounded-3xl glass-gradient-card border border-sky-300 shadow-xl max-w-3xl mx-auto space-y-3">
+        {/* 2. Brand Statement & Supporting Content */}
+        <section className="py-6">
+          <div className="p-8 rounded-3xl glass-gradient-card border border-sky-300 shadow-xl max-w-2xl mx-auto space-y-3">
             <h2 className="text-xl sm:text-2xl font-black text-[#0C4A6E]">
-              Intelligence on your own terms.
+              Intelligence on your terms.
             </h2>
             <p className="text-sm text-sky-900 font-medium leading-relaxed">
-              CYBERNEX runs neural models, vector knowledge stores, and code execution environments entirely inside your local infrastructure. Zero data sent outside.
+              CYBERNEX empowers your workflow with seamless AI tools built directly into your environment. Safe, responsive, and completely private.
             </p>
           </div>
         </section>
 
-        {/* 3. Simple Product Preview */}
-        <section className="space-y-4">
-          <span className="text-xs uppercase tracking-widest font-black text-sky-700">
-            WORKSPACE PREVIEW
-          </span>
-
-          <div className="rounded-3xl glass-gradient-card p-3 border border-sky-300 shadow-2xl overflow-hidden text-left max-w-4xl mx-auto">
-            <div className="bg-white/80 px-4 py-3 rounded-t-2xl border-b border-sky-200 flex items-center justify-between text-xs font-bold text-sky-900">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-rose-400" />
-                <span className="w-3 h-3 rounded-full bg-amber-400" />
-                <span className="w-3 h-3 rounded-full bg-emerald-400" />
-                <span className="ml-2 font-black text-[#0C4A6E]">CYBERNEX</span>
-              </div>
-              <span className="text-emerald-700 font-bold flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                ● LOCAL
-              </span>
-            </div>
-
-            <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-2">
-                <div className="text-xs font-bold text-sky-900 uppercase">Task</div>
-                <div className="p-3.5 rounded-xl bg-white/80 border border-sky-200 text-xs text-sky-950 font-medium leading-relaxed shadow-xs">
-                  "Analyze inspection report and compare findings against SOP-704."
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="text-xs font-bold text-sky-900 uppercase">Workflow</div>
-                <div className="space-y-1.5 text-xs font-bold">
-                  <div className="p-2 rounded-lg bg-white/70 border border-sky-200 text-sky-950">
-                    01 • OCR Extraction
-                  </div>
-                  <div className="p-2 rounded-lg bg-white/70 border border-sky-200 text-sky-950">
-                    02 • Knowledge Search
-                  </div>
-                  <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-800">
-                    03 • Verified Output
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="text-xs font-bold text-sky-900 uppercase">Deliverable</div>
-                <div className="p-3.5 rounded-xl bg-white/90 border border-sky-300 space-y-1 shadow-xs">
-                  <div className="text-xs font-black text-emerald-700 flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> Output Ready
-                  </div>
-                  <div className="text-xs font-black text-[#0C4A6E]">Approval_Note.docx</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 4. Final CTA */}
-        <section className="py-12 space-y-6">
-          <div className="p-10 rounded-3xl glass-gradient-card border border-sky-300 max-w-2xl mx-auto space-y-4 shadow-2xl">
-            <h2 className="text-3xl font-black text-[#0C4A6E]">
-              READY TO WORK?
+        {/* 3. Final CTA */}
+        <section className="py-8 space-y-6">
+          <div className="p-10 rounded-3xl glass-gradient-card border border-sky-300 max-w-xl mx-auto space-y-4 shadow-2xl">
+            <h2 className="text-2xl sm:text-3xl font-black text-[#0C4A6E]">
+              Ready to work?
             </h2>
             <div>
               <Button

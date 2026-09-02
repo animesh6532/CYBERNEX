@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Upload, ArrowRight, Eye, Code, Sparkles, RefreshCw } from 'lucide-react';
-import { Button } from '../components/ui/Button';
-import { FileCard } from '../components/ui/FileCard';
-import { MultimodalDemoModal } from '../components/workbench/MultimodalDemoModal';
-import { CodingDemoModal } from '../components/workbench/CodingDemoModal';
-import { useApp } from '../context/AppContext';
-import { UploadedFile } from '../types';
+import { Button } from '@/components/ui/Button';
+import { FileCard } from '@/components/ui/FileCard';
+import { MultimodalDemoModal } from '@/components/ui/MultimodalDemoModal';
+import { CodingDemoModal } from '@/components/ui/CodingDemoModal';
+import { useApp } from '@/context/AppContext';
+import { UploadedFile } from '@/types';
 
 export const WorkbenchPage: React.FC = () => {
   const navigate = useNavigate();
@@ -92,13 +92,13 @@ export const WorkbenchPage: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 font-sans">
-      {/* Page Title & Supporting Text */}
-      <div className="flex items-center justify-between pb-2 border-b border-sky-200">
+      {/* Top Header */}
+      <div className="flex items-center justify-between pb-2">
         <div>
           <h2 className="text-3xl font-black text-[#0C4A6E] tracking-tight">
             Workbench
           </h2>
-          <p className="text-xs text-sky-800 font-medium mt-0.5">
+          <p className="text-sm text-sky-800 font-medium mt-0.5">
             Create a task and let CYBERNEX handle the work.
           </p>
         </div>

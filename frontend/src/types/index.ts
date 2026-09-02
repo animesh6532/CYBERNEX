@@ -12,6 +12,8 @@ export interface ExecutionStep {
   details?: string;
 }
 
+export type WorkflowStep = ExecutionStep;
+
 export interface ExecutionLog {
   id: string;
   timestamp: string;
@@ -19,6 +21,8 @@ export interface ExecutionLog {
   level: 'info' | 'warn' | 'error' | 'success';
   category: 'SYSTEM' | 'ROUTING' | 'OCR' | 'RAG' | 'SANDBOX' | 'VERIFICATION';
 }
+
+export type LogEntry = ExecutionLog;
 
 export interface Citation {
   id: string;

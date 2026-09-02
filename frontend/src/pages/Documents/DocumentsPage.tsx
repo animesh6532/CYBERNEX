@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { FileText, Eye, Upload } from 'lucide-react';
-import { Button } from '../components/ui/Button';
-import { StatusBadge } from '../components/ui/StatusBadge';
-import { useApp } from '../context/AppContext';
+import { Button } from '@/components/ui/Button';
+import { StatusBadge } from '@/components/ui/StatusBadge';
+import { useApp } from '@/context/AppContext';
+import { DocumentItem } from '@/types';
 
 export const DocumentsPage: React.FC = () => {
   const { documents, showToast } = useApp();
   const [search, setSearch] = useState('');
 
-  const filtered = documents.filter((d) =>
+  const filtered = documents.filter((d: DocumentItem) =>
     d.name.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -52,7 +53,7 @@ export const DocumentsPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-sky-100 font-medium">
-              {filtered.map((doc) => (
+              {filtered.map((doc: DocumentItem) => (
                 <tr key={doc.id} className="hover:bg-white/60 transition-colors">
                   <td className="p-4 font-black text-[#0C4A6E] flex items-center gap-2">
                     <FileText className="w-4 h-4 text-sky-600 shrink-0" />

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Palette, User, Cpu, Shield, Bell } from 'lucide-react';
-import { GlassCard } from '../components/ui/GlassCard';
-import { useApp } from '../context/AppContext';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { useApp } from '@/context/AppContext';
 
 export const SettingsPage: React.FC = () => {
   const { showToast } = useApp();

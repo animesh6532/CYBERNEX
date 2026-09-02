@@ -27,7 +27,7 @@ export const AppRoutes: React.FC = () => {
         
         {/* Knowledge Base & Alias */}
         <Route path="/knowledge" element={<KnowledgeBasePage />} />
-        <Route path="/knowledge-base" element={<KnowledgeBasePage />} />
+        <Route path="/knowledge-base" element={<Navigate to="/knowledge" replace />} />
         
         <Route path="/runs" element={<RunsPage />} />
         <Route path="/runs/:id" element={<AgentExecutionPage />} />
@@ -38,7 +38,7 @@ export const AppRoutes: React.FC = () => {
         
         {/* System & Alias */}
         <Route path="/system" element={<AdminPage />} />
-        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin" element={<Navigate to="/system" replace />} />
         
         <Route path="/settings" element={<SettingsPage />} />
       </Route>

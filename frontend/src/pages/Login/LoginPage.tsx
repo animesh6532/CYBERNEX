@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
-import { CyberLogo } from '../components/ui/CyberLogo';
-import { Button } from '../components/ui/Button';
+import { CyberLogo } from '@/components/ui/CyberLogo';
+import { Button } from '@/components/ui/Button';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();

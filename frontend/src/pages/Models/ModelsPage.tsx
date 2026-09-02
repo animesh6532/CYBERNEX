@@ -1,7 +1,7 @@
 import React from 'react';
 import { Cpu, Server } from 'lucide-react';
-import { GlassCard } from '../components/ui/GlassCard';
-import { StatusBadge } from '../components/ui/StatusBadge';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 
 export const ModelsPage: React.FC = () => {
   const modelList = [

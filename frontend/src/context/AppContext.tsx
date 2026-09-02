@@ -10,8 +10,6 @@ interface AppContextType {
   systemMetrics: SystemMetrics;
   isSimulating: boolean;
   activeStepIndex: number;
-  sidebarCollapsed: boolean;
-  setSidebarCollapsed: (collapsed: boolean) => void;
   runAgentSimulation: (prompt: string, model: string, tools: string[], files: any[]) => string;
   addDocument: (doc: Partial<DocumentItem>) => void;
   toastMessage: string | null;
@@ -29,7 +27,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   
   const [isSimulating, setIsSimulating] = useState<boolean>(false);
   const [activeStepIndex, setActiveStepIndex] = useState<number>(12);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -143,8 +140,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         systemMetrics,
         isSimulating,
         activeStepIndex,
-        sidebarCollapsed,
-        setSidebarCollapsed,
         runAgentSimulation,
         addDocument,
         toastMessage,

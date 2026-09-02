@@ -1,6 +1,6 @@
 import React from 'react';
-import { GlassCard } from '../components/ui/GlassCard';
-import { useApp } from '../context/AppContext';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { useApp } from '@/context/AppContext';
 
 export const AdminPage: React.FC = () => {
   const { systemMetrics } = useApp();
