@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from app.schemas.task import UploadedFileSchema
 
 
@@ -8,35 +8,33 @@ class ExecutionStepSchema(BaseModel):
     code: str
     title: str
     subtitle: str
-    status: str  # pending, in_progress, completed, failed
+    status: str
     duration: Optional[str] = None
     timestamp: Optional[str] = None
     toolUsed: Optional[str] = None
     details: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class ExecutionLogSchema(BaseModel):
     id: str
     timestamp: str
     message: str
-    level: str  # info, warn, error, success
-    category: str  # SYSTEM, ROUTING, OCR, RAG, SANDBOX, VERIFICATION
+    level: str
+    category: str
 
 
 class DeliverableSchema(BaseModel):
     id: str
     name: str
-    type: str  # DOCX, XLSX, PPTX, PY, CSV, PDF
+    type: str
     size: str
-    status: str  # Verified, Generating, Draft
+    status: str
     summary: str
     downloadUrl: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class CitationSchema(BaseModel):
@@ -52,7 +50,7 @@ class CitationSchema(BaseModel):
 class FindingSchema(BaseModel):
     id: str
     title: str
-    severity: str  # HIGH, MEDIUM, LOW, CRITICAL
+    severity: str
     description: str
     evidenceSource: str
     page: int
@@ -61,7 +59,7 @@ class FindingSchema(BaseModel):
 class RunDetailResponse(BaseModel):
     id: str
     prompt: str
-    status: str  # queued, running, completed, failed, cancelled, waiting
+    status: str
     createdAt: str
     duration: Optional[str] = None
     selectedModel: str
@@ -73,5 +71,4 @@ class RunDetailResponse(BaseModel):
     findings: List[FindingSchema] = []
     deliverables: List[DeliverableSchema] = []
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}

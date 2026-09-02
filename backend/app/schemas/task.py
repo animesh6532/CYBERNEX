@@ -11,8 +11,7 @@ class UploadedFileSchema(BaseModel):
     status: str = "Ready"
     contentSummary: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class TaskCreate(BaseModel):
@@ -32,5 +31,4 @@ class TaskResponse(BaseModel):
     files: List[UploadedFileSchema] = []
     run_id: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
