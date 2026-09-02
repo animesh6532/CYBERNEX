@@ -54,7 +54,7 @@ class TaskFile(Base):
     __tablename__ = "task_files"
 
     id = Column(String, primary_key=True, index=True)
-    task_id = Column(String, ForeignKey("tasks.id"), nullable=False)
+    task_id = Column(String, ForeignKey("tasks.id"), nullable=True)
     original_name = Column(String, nullable=False)
     stored_name = Column(String, nullable=False)
     file_type = Column(String, nullable=False)  # PDF, DOCX, XLSX, IMAGE, CODE, etc.

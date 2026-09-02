@@ -33,8 +33,8 @@ class OllamaProvider(BaseModelProvider):
 
     async def generate(self, prompt: str, model_name: str, options: Optional[Dict[str, Any]] = None) -> str:
         if not await self.health_check():
-            logger.warning("Ollama service unavailable. Returning local fallback synthesis.")
-            return f"[CYBERNEX Local Synthesis ({model_name})]: Processed task context and generated structured analysis for prompt: '{prompt[:100]}...'"
+            logger.warning("Ollama service unavailable.")
+            return f"OLLAMA_UNAVAILABLE: Service is unreachable at {self.base_url}"
 
         payload = {
             "model": model_name,
@@ -48,12 +48,16 @@ class OllamaProvider(BaseModelProvider):
                 res = await client.post(f"{self.base_url}/api/generate", json=payload)
                 if res.status_code == 200:
                     return res.json().get("response", "")
+                return f"OLLAMA_UNAVAILABLE: HTTP {res.status_code} - {res.text}"
         except Exception as e:
             logger.error(f"Ollama generate error: {e}")
-
-        return f"[CYBERNEX Local Reasoning ({model_name})]: Completed sovereign execution."
+            return f"OLLAMA_UNAVAILABLE: {e}"
 
     async def stream(self, prompt: str, model_name: str, options: Optional[Dict[str, Any]] = None) -> AsyncGenerator[str, None]:
+        if not await self.health_check():
+            yield f"OLLAMA_UNAVAILABLE: Service is unreachable at {self.base_url}"
+            return
+
         payload = {
             "model": model_name,
             "prompt": prompt,
@@ -67,4 +71,5 @@ class OllamaProvider(BaseModelProvider):
                         yield chunk
         except Exception as e:
             logger.error(f"Ollama stream error: {e}")
-            yield f"[Ollama Connection Error]: {e}"
+            yield f"OLLAMA_UNAVAILABLE: {e}"
+

@@ -17,81 +17,42 @@ settings = get_settings()
 @router.get("", response_model=List[AIModelSchema], summary="List Sovereign AI Models")
 async def list_models(db: Session = Depends(get_db)):
     is_ollama_online = await ollama_provider.health_check()
-    live_status = "ONLINE" if is_ollama_online else ("ONLINE" if settings.DEMO_MODE else "UNAVAILABLE")
+    if not is_ollama_online:
+        return []
 
-    db_models = db.query(models.Model).all()
-    if not db_models:
-        # Seed default models
-        defaults = [
-            models.Model(
-                id="m1",
-                name="CYBERNEX General (Llama-3-70B)",
-                role="Reasoning & Synthesis",
-                category="GENERAL",
-                status=live_status,
-                local_inference=True,
-                context_window="128,000 tokens",
-                vram_usage="38.4 / 48.0 GB",
-                gpu_load=42,
-                throughput="48.5 t/s",
-                last_check="1s ago"
-            ),
-            models.Model(
-                id="m2",
-                name="CYBERNEX Code (Qwen2.5-Coder-32B)",
-                role="Sandboxed Code & Scripts",
-                category="CODING",
-                status=live_status,
-                local_inference=True,
-                context_window="64,000 tokens",
-                vram_usage="18.2 / 24.0 GB",
-                gpu_load=12,
-                throughput="72.1 t/s",
-                last_check="2s ago"
-            ),
-            models.Model(
-                id="m3",
-                name="CYBERNEX Vision (Llama-3.2-Vision)",
-                role="Multimodal & Technical Diagrams",
-                category="VISION",
-                status=live_status,
-                local_inference=True,
-                context_window="32,000 tokens",
-                vram_usage="14.0 / 24.0 GB",
-                gpu_load=0,
-                throughput="34.0 t/s",
-                last_check="1s ago"
-            ),
-            models.Model(
-                id="m4",
-                name="CYBERNEX Embed (BGE-M3-Multilingual)",
-                role="Local Dense & Sparse RAG",
-                category="EMBEDDING",
+    ollama_models = await ollama_provider.list_models()
+    result: List[AIModelSchema] = []
+
+    for idx, raw_model in enumerate(ollama_models):
+        name = raw_model.get("name", f"model-{idx}")
+        details = raw_model.get("details", {})
+        parameter_size = details.get("parameter_size", "")
+        family = details.get("family", "")
+
+        category = "GENERAL"
+        if "code" in name.lower() or "coder" in name.lower():
+            category = "CODING"
+        elif "vision" in name.lower() or "llava" in name.lower():
+            category = "VISION"
+
+        size_bytes = raw_model.get("size", 0)
+        size_gb = f"{round(size_bytes / (1024 ** 3), 1)} GB" if size_bytes else "N/A"
+
+        result.append(
+            AIModelSchema(
+                id=f"ollama-{name}",
+                name=name,
+                role=f"{family.capitalize()} ({parameter_size})" if family else "Local Reasoning",
+                category=category,
                 status="ONLINE",
-                local_inference=True,
-                context_window="8,192 tokens",
-                vram_usage="4.2 / 12.0 GB",
-                gpu_load=5,
-                throughput="1,200 docs/s",
-                last_check="1s ago"
-            ),
-        ]
-        db.add_all(defaults)
-        db.commit()
-        db_models = defaults
+                localInference=True,
+                contextWindow="8,192 tokens",
+                vramUsage=size_gb,
+                gpuLoad=0,
+                throughput="Local",
+                lastCheck="Now"
+            )
+        )
 
-    return [
-        AIModelSchema(
-            id=m.id,
-            name=m.name,
-            role=m.role,
-            category=m.category,
-            status=live_status if m.category != "EMBEDDING" else "ONLINE",
-            localInference=m.local_inference,
-            contextWindow=m.context_window,
-            vramUsage=m.vram_usage,
-            gpuLoad=m.gpu_load,
-            throughput=m.throughput,
-            lastCheck=m.last_check
-        ) for m in db_models
-    ]
+    return result
+

@@ -22,9 +22,10 @@ class Settings(BaseSettings):
     QDRANT_URL: str = "http://localhost:6333"
     OLLAMA_URL: str = "http://localhost:11434"
 
-    GENERAL_MODEL: str = "CYBERNEX General (Llama-3-70B)"
-    CODING_MODEL: str = "CYBERNEX Code (Qwen2.5-Coder-32B)"
-    VISION_MODEL: str = "CYBERNEX Vision (Llama-3.2-Vision)"
+    GENERAL_MODEL: str = "llama3"
+    CODING_MODEL: str = "qwen2.5-coder"
+    VISION_MODEL: str = "llama3.2-vision"
+    EMBEDDING_MODEL: str = "BAAI/bge-small-en-v1.5"
 
     UPLOAD_DIR: str = "./storage/uploads"
     DOCUMENT_DIR: str = "./storage/documents"

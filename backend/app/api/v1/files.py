@@ -25,11 +25,9 @@ async def upload_file(
     file_type = get_file_type(original_name)
     size_formatted = f"{round(size_bytes / (1024 * 1024), 1)} MB" if size_bytes >= 1024*1024 else f"{round(size_bytes / 1024, 1)} KB"
 
-    # Temporary unattached TaskFile record
-    dummy_task_id = "unattached"
     db_file = models.TaskFile(
         id=file_id,
-        task_id=dummy_task_id,
+        task_id=None,
         original_name=original_name,
         stored_name=stored_name,
         file_type=file_type,
@@ -39,16 +37,9 @@ async def upload_file(
         file_path=file_path,
         status="Ready"
     )
-    
-    # Check if dummy unattached task exists
-    dummy_task = db.query(models.Task).filter(models.Task.id == dummy_task_id).first()
-    if not dummy_task:
-        dummy_task = models.Task(id=dummy_task_id, prompt="Temporary Unattached Uploads", status="idle")
-        db.add(dummy_task)
-        db.commit()
-
     db.add(db_file)
     db.commit()
+
 
     return UploadedFileSchema(
         id=file_id,

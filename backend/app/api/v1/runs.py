@@ -22,13 +22,12 @@ def list_runs(db: Session = Depends(get_db)):
 def get_run(run_id: str, db: Session = Depends(get_db)):
     run = db.query(models.Run).filter(models.Run.id == run_id).first()
     if not run:
-        # Fallback to mock demo task run if default seed
-        run = db.query(models.Run).first()
-        if not run:
-            raise HTTPException(status_code=404, detail="Run execution ID not found.")
+        raise HTTPException(status_code=404, detail="Run execution ID not found.")
 
     task = db.query(models.Task).filter(models.Task.id == run.task_id).first()
-    prompt = task.prompt if task else "Analyze the inspection report, identify findings, and prepare approval note."
+    prompt = task.prompt if task else "User Execution Task"
+    selected_tools = task.selected_tools if task else []
+
     files = [
         UploadedFileSchema(id=f.id, name=f.original_name, size=f.size_formatted, type=f.file_type, status=f.status)
         for f in (task.files if task else [])
@@ -60,38 +59,18 @@ def get_run(run_id: str, db: Session = Depends(get_db)):
         ) for d in run.deliverables
     ]
 
-    # Citations & Findings
-    citations = [
-        CitationSchema(
-            id="cit-1",
-            sourceName="Standard Operating Procedure (SOP-704)",
-            sourceFile="Inspection_SOP.pdf",
-            page=14,
-            section="4.2 Pressure Tolerance Limits",
-            snippet="Stage 2 turbine operating pressure must remain within 140 PSI ± 5.0 PSI. Any pressure exceeding 150.0 PSI requires immediate approval note.",
-            confidence=0.984
-        )
-    ]
-
-    findings = [
-        FindingSchema(
-            id="f1",
-            title="Stage 2 Turbine Pressure Deviation Detected",
-            severity="HIGH",
-            description="Recorded operating pressure reached 154.2 PSI, exceeding nominal tolerance by 9.2 PSI (+6.3%).",
-            evidenceSource="inspection_report.pdf",
-            page=7
-        )
-    ]
+    # Citations & Findings are empty unless generated during execution
+    citations = []
+    findings = []
 
     return RunDetailResponse(
         id=run.id,
         prompt=prompt,
         status=run.status,
         createdAt=run.started_at,
-        duration=run.duration or "18.4s",
+        duration=run.duration or "1.2s",
         selectedModel=run.selected_model,
-        selectedTools=["OCR", "Knowledge", "Code", "Documents"],
+        selectedTools=selected_tools,
         files=files,
         steps=steps_schemas,
         logs=[],
@@ -120,17 +99,31 @@ def get_run_steps(run_id: str, db: Session = Depends(get_db)):
 
 
 @router.get("/{run_id}/events", summary="Stream Run Progress Events (SSE)")
-async def stream_run_events(run_id: str):
+async def stream_run_events(run_id: str, db: Session = Depends(get_db)):
     async def event_generator():
-        for i in range(1, 13):
+        run = db.query(models.Run).filter(models.Run.id == run_id).first()
+        if not run:
+            data = json.dumps({"event": "run.failed", "run_id": run_id, "error": "Run not found"})
+            yield f"data: {data}\n\n"
+            return
+
+        steps = db.query(models.RunStep).filter(models.RunStep.run_id == run_id).order_by(models.RunStep.step_index).all()
+        for step in steps:
             data = json.dumps({
-                "event": "step.completed" if i < 12 else "run.completed",
+                "event": "step.completed",
                 "run_id": run_id,
-                "stepIndex": i,
-                "status": "completed" if i < 12 else "completed"
+                "stepIndex": step.step_index,
+                "title": step.title,
+                "status": step.status
             })
             yield f"data: {data}\n\n"
-            await asyncio.sleep(0.5)
+
+        final_data = json.dumps({
+            "event": "run.completed" if run.status == "completed" else f"run.{run.status}",
+            "run_id": run_id,
+            "status": run.status
+        })
+        yield f"data: {final_data}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
@@ -143,3 +136,4 @@ def cancel_run(run_id: str, db: Session = Depends(get_db)):
     run.status = "cancelled"
     db.commit()
     return {"message": f"Run {run_id} has been cancelled."}
+

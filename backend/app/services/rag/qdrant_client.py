@@ -1,10 +1,12 @@
+import uuid
 from typing import List, Dict, Any, Optional
 from app.core.config import get_settings
 from app.core.logging import logger
+from app.services.rag.embeddings import embed_texts, embed_query, get_vector_dimension
 
 try:
     from qdrant_client import QdrantClient
-    from qdrant_client.http.models import Distance, VectorParams
+    from qdrant_client.http.models import Distance, VectorParams, PointStruct
     QDRANT_SDK_AVAILABLE = True
 except ImportError:
     QDRANT_SDK_AVAILABLE = False
@@ -33,32 +35,82 @@ class QdrantService:
 
     def list_collections(self) -> List[Dict[str, Any]]:
         if not self.health_check():
-            # Return default local collections metadata
-            return [
-                {"name": "SOPs", "document_count": 12, "vector_count": 284},
-                {"name": "Manuals", "document_count": 8, "vector_count": 731},
-                {"name": "Reports", "document_count": 15, "vector_count": 497},
-                {"name": "Policies", "document_count": 6, "vector_count": 142},
-            ]
+            return []
         try:
             colls = self._client.get_collections().collections
-            return [{"name": c.name, "document_count": 5, "vector_count": 100} for c in colls]
+            result = []
+            for c in colls:
+                try:
+                    info = self._client.get_collection(collection_name=c.name)
+                    vectors_count = getattr(info, "vectors_count", getattr(info, "points_count", 0)) or 0
+                    points_count = getattr(info, "points_count", 0) or 0
+                except Exception:
+                    vectors_count = 0
+                    points_count = 0
+
+                result.append({
+                    "name": c.name,
+                    "document_count": points_count,
+                    "vector_count": vectors_count
+                })
+            return result
         except Exception as e:
             logger.error(f"Error listing Qdrant collections: {e}")
             return []
 
-    def create_collection(self, collection_name: str, vector_size: int = 384) -> bool:
+    def create_collection(self, collection_name: str, vector_size: Optional[int] = None) -> bool:
         if not self.health_check():
-            logger.info(f"Mock collection created: {collection_name}")
-            return True
+            logger.warning(f"Qdrant unavailable. Cannot create collection {collection_name}")
+            return False
+        if vector_size is None:
+            vector_size = get_vector_dimension()
         try:
-            self._client.recreate_collection(
-                collection_name=collection_name,
-                vectors_config=VectorParams(size=vector_size, distance=Distance.COSINE),
-            )
+            collections = [c.name for c in self._client.get_collections().collections]
+            if collection_name not in collections:
+                self._client.create_collection(
+                    collection_name=collection_name,
+                    vectors_config=VectorParams(size=vector_size, distance=Distance.COSINE),
+                )
             return True
         except Exception as e:
             logger.error(f"Error creating collection {collection_name}: {e}")
+            return False
+
+    def upsert_chunks(
+        self,
+        collection_name: str,
+        chunks: List[str],
+        document_id: str,
+        filename: str,
+        start_page: int = 1
+    ) -> bool:
+        if not self.health_check() or not chunks:
+            return False
+
+        self.create_collection(collection_name)
+        embeddings = embed_texts(chunks)
+        if not embeddings:
+            logger.warning("Could not generate embeddings for chunks.")
+            return False
+
+        points = []
+        for idx, (chunk, vector) in enumerate(zip(chunks, embeddings)):
+            point_id = str(uuid.uuid4())
+            payload = {
+                "text": chunk,
+                "document_id": document_id,
+                "filename": filename,
+                "page": start_page + idx,
+                "chunk_index": idx
+            }
+            points.append(PointStruct(id=point_id, vector=vector, payload=payload))
+
+        try:
+            self._client.upsert(collection_name=collection_name, points=points)
+            logger.info(f"Upserted {len(points)} vector chunks into Qdrant collection '{collection_name}'")
+            return True
+        except Exception as e:
+            logger.error(f"Error upserting vectors to Qdrant: {e}")
             return False
 
     def search(
@@ -68,26 +120,38 @@ class QdrantService:
         limit: int = 5
     ) -> List[Dict[str, Any]]:
         """
-        Executes semantic search against vector database.
+        Executes real semantic vector search against Qdrant.
         """
-        # Fallback structured search results matching mock SOP data
-        logger.info(f"Executing local RAG search for query '{query_text}' in collection '{collection_name}'")
-        return [
-            {
-                "text": "Stage 2 turbine operating pressure must remain within 140 PSI ± 5.0 PSI. Any pressure exceeding 150.0 PSI requires immediate conditional maintenance logging and supervisor approval note prior to restart.",
-                "document_id": "doc-1",
-                "filename": "Inspection_SOP.pdf",
-                "page": 14,
-                "score": 0.984
-            },
-            {
-                "text": "Approval notes for deviations between +5% and +10% above nominal limits must specify secondary telemetry checks on bearing vibration before clearance.",
-                "document_id": "doc-1",
-                "filename": "Inspection_SOP.pdf",
-                "page": 18,
-                "score": 0.941
-            }
-        ]
+        if not self.health_check():
+            logger.warning("Qdrant service unavailable for search.")
+            return []
+
+        query_vector = embed_query(query_text)
+        if not query_vector:
+            logger.warning("Could not generate query embedding.")
+            return []
+
+        try:
+            results = self._client.search(
+                collection_name=collection_name,
+                query_vector=query_vector,
+                limit=limit
+            )
+            hits = []
+            for hit in results:
+                payload = hit.payload or {}
+                hits.append({
+                    "text": payload.get("text", ""),
+                    "document_id": payload.get("document_id", ""),
+                    "filename": payload.get("filename", ""),
+                    "page": payload.get("page", 1),
+                    "score": round(hit.score, 4)
+                })
+            return hits
+        except Exception as e:
+            logger.error(f"Qdrant vector search failed: {e}")
+            return []
 
 
 qdrant_service = QdrantService()
+
