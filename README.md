@@ -1,4 +1,4 @@
-![CYBERNEX Sovereign AI Workbench Banner](file:///d:/PROJECTS/CYBERNEX/docs/assets/cybernex-banner.svg)
+![CYBERNEX Sovereign AI Workbench Banner](docs/assets/cybernex-banner.svg)
 
 # CYBERNEX — Sovereign On-Premise Agentic AI Workbench
 
@@ -34,7 +34,7 @@ Standard enterprise AI applications rely on third-party cloud APIs, exposing con
 
 ## 4. Architecture
 
-![CYBERNEX Full-Stack Architecture](file:///d:/PROJECTS/CYBERNEX/docs/assets/cybernex-architecture.svg)
+![CYBERNEX Full-Stack Architecture](docs/assets/cybernex-architecture.svg)
 
 The CYBERNEX full-stack system comprises three decoupled layers:
 1. **React 18 Frontend**: Premium light sky-blue glass UI with workspace navbar, task composer, SSE execution timeline console, and telemetry dashboards.
@@ -45,7 +45,7 @@ The CYBERNEX full-stack system comprises three decoupled layers:
 
 ## 5. Execution Workflow
 
-![CYBERNEX Execution Workflow](file:///d:/PROJECTS/CYBERNEX/docs/assets/cybernex-workflow.svg)
+![CYBERNEX Execution Workflow](docs/assets/cybernex-workflow.svg)
 
 ```
 USER TASK & ATTACHMENTS
