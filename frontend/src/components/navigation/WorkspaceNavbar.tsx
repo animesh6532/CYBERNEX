@@ -63,6 +63,12 @@ export const WorkspaceNavbar: React.FC = () => {
 
         {/* Right: ● Local + Profile */}
         <div className="flex items-center gap-2.5 shrink-0">
+          {import.meta.env.VITE_DEMO_MODE === 'true' && (
+            <div className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100/90 border border-amber-300 text-amber-900 text-[10px] font-bold shadow-xs">
+              <span>DEMO MODE</span>
+            </div>
+          )}
+
           <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/60 border border-sky-200 text-sky-900 text-[11px] font-bold shadow-xs">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
             <span>Local</span>

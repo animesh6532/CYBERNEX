@@ -8,6 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     APP_NAME: str = "CYBERNEX"
     ENVIRONMENT: str = "development"
+    DEMO_MODE: bool = False
     DEBUG: bool = True
 
     HOST: str = "127.0.0.1"

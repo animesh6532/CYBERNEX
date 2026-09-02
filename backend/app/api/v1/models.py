@@ -6,11 +6,19 @@ from app.db.database import get_db
 from app.db import models
 from app.schemas.model import AIModelSchema
 
+from app.core.config import get_settings
+from app.services.models.ollama_client import OllamaProvider
+
 router = APIRouter(prefix="/models", tags=["Models"])
+ollama_provider = OllamaProvider()
+settings = get_settings()
 
 
 @router.get("", response_model=List[AIModelSchema], summary="List Sovereign AI Models")
-def list_models(db: Session = Depends(get_db)):
+async def list_models(db: Session = Depends(get_db)):
+    is_ollama_online = await ollama_provider.health_check()
+    live_status = "ONLINE" if is_ollama_online else ("ONLINE" if settings.DEMO_MODE else "UNAVAILABLE")
+
     db_models = db.query(models.Model).all()
     if not db_models:
         # Seed default models
@@ -20,7 +28,7 @@ def list_models(db: Session = Depends(get_db)):
                 name="CYBERNEX General (Llama-3-70B)",
                 role="Reasoning & Synthesis",
                 category="GENERAL",
-                status="ONLINE",
+                status=live_status,
                 local_inference=True,
                 context_window="128,000 tokens",
                 vram_usage="38.4 / 48.0 GB",
@@ -33,7 +41,7 @@ def list_models(db: Session = Depends(get_db)):
                 name="CYBERNEX Code (Qwen2.5-Coder-32B)",
                 role="Sandboxed Code & Scripts",
                 category="CODING",
-                status="ONLINE",
+                status=live_status,
                 local_inference=True,
                 context_window="64,000 tokens",
                 vram_usage="18.2 / 24.0 GB",
@@ -46,7 +54,7 @@ def list_models(db: Session = Depends(get_db)):
                 name="CYBERNEX Vision (Llama-3.2-Vision)",
                 role="Multimodal & Technical Diagrams",
                 category="VISION",
-                status="ONLINE",
+                status=live_status,
                 local_inference=True,
                 context_window="32,000 tokens",
                 vram_usage="14.0 / 24.0 GB",
@@ -78,7 +86,7 @@ def list_models(db: Session = Depends(get_db)):
             name=m.name,
             role=m.role,
             category=m.category,
-            status=m.status,
+            status=live_status if m.category != "EMBEDDING" else "ONLINE",
             localInference=m.local_inference,
             contextWindow=m.context_window,
             vramUsage=m.vram_usage,

@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="50%" stop-color="#0369a1"/>
+      <stop offset="100%" stop-color="#0c4a6e"/>
+    </linearGradient>
+
+    <!-- Glass Surface Gradient -->
+    <linearGradient id="glassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255, 255, 255, 0.25)"/>
+      <stop offset="100%" stop-color="rgba(255, 255, 255, 0.08)"/>
+    </linearGradient>
+
+    <!-- Accent Sky Glow -->
+    <radialGradient id="skyGlow" cx="50%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#0284c7" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Base Canvas -->
+  <rect width="1200" height="400" rx="24" fill="url(#bgGrad)"/>
+
+  <!-- Radial Light Glow -->
+  <rect width="1200" height="400" rx="24" fill="url(#skyGlow)"/>
+
+  <!-- Grid Pattern Overlay -->
+  <g opacity="0.08" stroke="#ffffff" stroke-width="1">
+    <path d="M 0 50 L 1200 50 M 0 100 L 1200 100 M 0 150 L 1200 150 M 0 200 L 1200 200 M 0 250 L 1200 250 M 0 300 L 1200 300 M 0 350 L 1200 350" />
+    <path d="M 100 0 L 100 400 M 200 0 L 200 400 M 300 0 L 300 400 M 400 0 L 400 400 M 500 0 L 500 400 M 600 0 L 600 400 M 700 0 L 700 400 M 800 0 L 800 400 M 900 0 L 900 400 M 1000 0 L 1000 400 M 1100 0 L 1100 400" />
+  </g>
+
+  <!-- Central Glass Card -->
+  <rect x="80" y="60" width="1040" height="280" rx="20" fill="url(#glassGrad)" stroke="rgba(224, 242, 254, 0.4)" stroke-width="1.5"/>
+
+  <!-- Top Accent Bar -->
+  <line x1="80" y1="60" x2="1120" y2="60" stroke="#7dd3fc" stroke-width="2" opacity="0.6"/>
+
+  <!-- Title & Subtitle -->
+  <g text-anchor="middle" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+    <text x="600" y="165" font-size="56" font-weight="900" fill="#ffffff" letter-spacing="4">CYBERNEX</text>
+    <text x="600" y="215" font-size="22" font-weight="600" fill="#bae6fd" letter-spacing="1.5">SOVEREIGN ON-PREMISE AGENTIC AI WORKBENCH</text>
+    <text x="600" y="260" font-size="14" font-weight="500" fill="#7dd3fc" letter-spacing="0.5">Zero Cloud Dependency • Open-Weight Multimodal LLMs • Sandboxed Local Tools</text>
+  </g>
+
+  <!-- Bottom Badges -->
+  <g transform="translate(360, 290)" font-family="system-ui, sans-serif" font-size="11" font-weight="700">
+    <!-- Badge 1: Local Air-Gap -->
+    <rect x="0" y="0" width="140" height="26" rx="13" fill="rgba(255,255,255,0.15)" stroke="#7dd3fc" stroke-width="1"/>
+    <text x="70" y="17" fill="#ffffff" text-anchor="middle">AIR-GAPPED</text>
+
+    <!-- Badge 2: Multimodal Router -->
+    <rect x="170" y="0" width="140" height="26" rx="13" fill="rgba(255,255,255,0.15)" stroke="#7dd3fc" stroke-width="1"/>
+    <text x="240" y="17" fill="#ffffff" text-anchor="middle">MODEL ROUTER</text>
+
+    <!-- Badge 3: Docker Sandbox -->
+    <rect x="340" y="0" width="140" height="26" rx="13" fill="rgba(255,255,255,0.15)" stroke="#7dd3fc" stroke-width="1"/>
+    <text x="410" y="17" fill="#ffffff" text-anchor="middle">LOCAL SANDBOX</text>
+  </g>
+</svg>

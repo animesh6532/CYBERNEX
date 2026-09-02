@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650" width="100%" height="100%">
+  <defs>
+    <linearGradient id="wfBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0f9ff"/>
+      <stop offset="100%" stop-color="#e0f2fe"/>
+    </linearGradient>
+    <linearGradient id="nodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="900" height="650" rx="16" fill="url(#wfBg)" stroke="#bae6fd" stroke-width="1.5"/>
+
+  <!-- Title -->
+  <text x="450" y="45" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" font-weight="800" fill="#0c4a6e">CYBERNEX EXECUTION WORKFLOW</text>
+
+  <g font-family="system-ui, sans-serif" font-size="12" font-weight="700" text-anchor="middle">
+    <!-- User Input -->
+    <rect x="350" y="75" width="200" height="40" rx="10" fill="#0284c7" stroke="#0369a1" stroke-width="1"/>
+    <text x="450" y="100" fill="#ffffff">USER TASK &amp; ATTACHMENTS</text>
+    <path d="M 450 115 L 450 135" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- React Workbench UI -->
+    <rect x="330" y="135" width="240" height="40" rx="10" fill="url(#nodeGrad)" stroke="#38bdf8" stroke-width="1.5"/>
+    <text x="450" y="160" fill="#0c4a6e">CYBERNEX REACT WORKBENCH</text>
+    <path d="M 450 175 L 450 195" stroke="#0284c7" stroke-width="2"/>
+
+    <!-- FastAPI Backend -->
+    <rect x="330" y="195" width="240" height="40" rx="10" fill="url(#nodeGrad)" stroke="#38bdf8" stroke-width="1.5"/>
+    <text x="450" y="220" fill="#0c4a6e">FASTAPI REST / SSE BACKEND</text>
+    <path d="M 450 235 L 450 255" stroke="#0284c7" stroke-width="2"/>
+
+    <!-- Agent Orchestrator -->
+    <rect x="310" y="255" width="280" height="40" rx="10" fill="#0369a1" stroke="#0c4a6e" stroke-width="1"/>
+    <text x="450" y="280" fill="#ffffff">LANGGRAPH AGENT ORCHESTRATOR</text>
+    <path d="M 450 295 L 450 315" stroke="#0284c7" stroke-width="2"/>
+
+    <!-- Model Router -->
+    <rect x="330" y="315" width="240" height="40" rx="10" fill="url(#nodeGrad)" stroke="#0284c7" stroke-width="1.5"/>
+    <text x="450" y="340" fill="#0c4a6e">MODEL ROUTER (AUTO)</text>
+
+    <!-- Branch Paths to Local Models -->
+    <path d="M 330 335 L 200 375 L 200 395" stroke="#0284c7" stroke-width="1.5" fill="none"/>
+    <path d="M 450 355 L 450 395" stroke="#0284c7" stroke-width="1.5"/>
+    <path d="M 570 335 L 700 375 L 700 395" stroke="#0284c7" stroke-width="1.5" fill="none"/>
+
+    <!-- Local Models -->
+    <rect x="120" y="395" width="160" height="35" rx="8" fill="#e0f2fe" stroke="#0284c7"/>
+    <text x="200" y="417" fill="#0c4a6e">GENERAL MODEL</text>
+
+    <rect x="370" y="395" width="160" height="35" rx="8" fill="#e0f2fe" stroke="#0284c7"/>
+    <text x="450" y="417" fill="#0c4a6e">CODING MODEL</text>
+
+    <rect x="620" y="395" width="160" height="35" rx="8" fill="#e0f2fe" stroke="#0284c7"/>
+    <text x="700" y="417" fill="#0c4a6e">VISION MODEL</text>
+
+    <!-- Paths to Tools -->
+    <path d="M 200 430 L 200 470" stroke="#0284c7" stroke-width="1.5"/>
+    <path d="M 450 430 L 450 470" stroke="#0284c7" stroke-width="1.5"/>
+    <path d="M 700 430 L 700 470" stroke="#0284c7" stroke-width="1.5"/>
+
+    <!-- Local Tools -->
+    <rect x="120" y="470" width="160" height="35" rx="8" fill="#ffffff" stroke="#38bdf8"/>
+    <text x="200" y="492" fill="#0c4a6e">PyMuPDF / OCR</text>
+
+    <rect x="370" y="470" width="160" height="35" rx="8" fill="#ffffff" stroke="#38bdf8"/>
+    <text x="450" y="492" fill="#0c4a6e">DOCKER SANDBOX</text>
+
+    <rect x="620" y="470" width="160" height="35" rx="8" fill="#ffffff" stroke="#38bdf8"/>
+    <text x="700" y="492" fill="#0c4a6e">QDRANT RAG</text>
+
+    <!-- Converge to Verification -->
+    <path d="M 200 505 L 450 530" stroke="#0284c7" stroke-width="1.5" fill="none"/>
+    <path d="M 450 505 L 450 530" stroke="#0284c7" stroke-width="1.5"/>
+    <path d="M 700 505 L 450 530" stroke="#0284c7" stroke-width="1.5" fill="none"/>
+
+    <!-- Verification & Output -->
+    <rect x="310" y="530" width="280" height="35" rx="8" fill="#0284c7" stroke="#0c4a6e"/>
+    <text x="450" y="552" fill="#ffffff">AUDIT GUARD &amp; VERIFICATION</text>
+    <path d="M 450 565 L 450 585" stroke="#0284c7" stroke-width="2"/>
+
+    <rect x="330" y="585" width="240" height="35" rx="8" fill="#0c4a6e" stroke="#0369a1"/>
+    <text x="450" y="607" fill="#ffffff">VERIFIED OUTPUT DELIVERABLE</text>
+  </g>
+</svg>
