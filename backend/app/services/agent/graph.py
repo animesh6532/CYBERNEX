@@ -3,6 +3,7 @@ import uuid
 from typing import TypedDict, List, Dict, Any, Optional
 from langgraph.graph import StateGraph, START, END
 
+from app.core.config import get_settings
 from app.core.logging import logger
 from app.services.router.model_router import model_router
 from app.services.ocr.service import ocr_service
@@ -10,7 +11,9 @@ from app.services.rag.retrieval import rag_retrieval
 from app.services.sandbox.executor import sandbox_executor
 from app.services.documents.generator import doc_generator
 from app.services.models.ollama_client import OllamaProvider
+from app.services.vision.service import vision_service
 
+settings = get_settings()
 ollama_provider = OllamaProvider()
 
 
@@ -123,7 +126,7 @@ def select_tools_node(state: AgentState) -> AgentState:
     return state
 
 
-def execute_node(state: AgentState) -> AgentState:
+async def execute_node(state: AgentState) -> AgentState:
     tools = state.get("selected_tools", [])
     files = state.get("files", [])
     prompt = state.get("prompt", "")
@@ -150,7 +153,39 @@ def execute_node(state: AgentState) -> AgentState:
         sandbox_res = sandbox_executor.run_code(prompt)
         exec_result = sandbox_res.get("stdout") or sandbox_res.get("stderr")
 
-    state["execution_result"] = exec_result or "Execution finished cleanly."
+    state["execution_result"] = exec_result or ""
+
+    if state.get("model_routed") == settings.VISION_MODEL:
+        image_analysis = []
+        for f in files:
+            file_path = f.get("file_path")
+            original_name = f.get("original_name", "")
+            if not file_path or not os.path.exists(file_path):
+                continue
+            if f.get("file_type") == "IMAGE" or original_name.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
+                vision_res = await vision_service.analyze_image(file_path, prompt=prompt)
+                image_analysis.append(
+                    f"[Vision analysis of {original_name}]: {vision_res.get('description', '')}"
+                )
+
+        if image_analysis:
+            state["execution_result"] += ("\n" if state["execution_result"] else "") + "\n".join(image_analysis)
+        else:
+            state["execution_result"] = state["execution_result"] or "Execution finished cleanly."
+    else:
+        context_snippets = [c.get("text", "")[:500] for c in retrieved_chunks[:3]]
+        reasoning_prompt = (
+            f"Task: {prompt}\n\n"
+            f"Relevant extracted evidence:\n{extracted_text[:1500]}\n\n"
+            f"Relevant knowledge base excerpts:\n" + "\n---\n".join(context_snippets)
+        )
+
+        llm_response = await ollama_provider.generate(
+            prompt=reasoning_prompt,
+            model_name=state.get("model_routed", state.get("selected_model", "llama3.2"))
+        )
+
+        state["execution_result"] = llm_response or state["execution_result"] or "Execution finished cleanly."
     state["current_step"] = 5
     state["step_events"].append({
         "step_index": 5,
@@ -197,10 +232,11 @@ def generate_output_node(state: AgentState) -> AgentState:
     prompt = state.get("prompt", "Task Output")
     chunks = state.get("retrieved_chunks", [])
     ocr_text = state.get("ocr_text", "")
+    execution_result = state.get("execution_result", "")
     prompt_lower = prompt.lower()
 
     sections = [
-        {"title": "1. Executive Summary", "content": f"Task Prompt: {prompt}\n\nProcessed task context locally with zero cloud dependencies."},
+        {"title": "1. Executive Summary", "content": execution_result or f"Task Prompt: {prompt}\n\nProcessed task context locally with zero cloud dependencies."},
         {"title": "2. Extracted Evidence & Context", "content": ocr_text if ocr_text else "No uploaded attachment text."},
         {"title": "3. Vector Knowledge References", "content": "\n\n".join([c.get("text", "") for c in chunks]) if chunks else "No vector chunks retrieved."}
     ]

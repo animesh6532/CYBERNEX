@@ -24,6 +24,10 @@ class QdrantService:
             except Exception as e:
                 logger.debug(f"Qdrant connection error: {e}")
 
+    @property
+    def is_available(self) -> bool:
+        return self.health_check()
+
     def health_check(self) -> bool:
         if not self._client:
             return False

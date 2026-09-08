@@ -10,8 +10,8 @@ router = APIRouter(prefix="/security", tags=["Security Monitoring"])
 
 
 @router.get("/status", response_model=SecurityStatusSchema, summary="Get Zero-Cloud Security Telemetry")
-def get_security_status():
-    return security_monitor.get_status()
+async def get_security_status():
+    return await security_monitor.get_status()
 
 
 @router.get("/events", summary="List Security Events")

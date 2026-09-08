@@ -31,7 +31,7 @@ class OllamaProvider(BaseModelProvider):
             logger.debug(f"Ollama list_models failed: {e}")
         return []
 
-    async def generate(self, prompt: str, model_name: str, options: Optional[Dict[str, Any]] = None) -> str:
+    async def generate(self, prompt: str, model_name: str, options: Optional[Dict[str, Any]] = None, images: Optional[List[str]] = None) -> str:
         if not await self.health_check():
             logger.warning("Ollama service unavailable.")
             return f"OLLAMA_UNAVAILABLE: Service is unreachable at {self.base_url}"
@@ -42,9 +42,11 @@ class OllamaProvider(BaseModelProvider):
             "stream": False,
             "options": options or {}
         }
+        if images:
+            payload["images"] = images
 
         try:
-            async with httpx.AsyncClient(timeout=60.0) as client:
+            async with httpx.AsyncClient(timeout=120.0) as client:
                 res = await client.post(f"{self.base_url}/api/generate", json=payload)
                 if res.status_code == 200:
                     return res.json().get("response", "")
