@@ -33,6 +33,7 @@ __pycache__/
 .venv/
 venv/
 env/
+.env
 
 # Backend runtime storage
 backend/storage/uploads/*

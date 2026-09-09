@@ -14,6 +14,7 @@ from app.api.v1.sandbox import router as sandbox_router
 from app.api.v1.security import router as security_router
 from app.api.v1.system import router as system_router
 from app.api.v1.settings import router as settings_router
+from app.api.v1.chat import router as chat_router
 
 api_router = APIRouter()
 
@@ -31,3 +32,4 @@ api_router.include_router(sandbox_router)
 api_router.include_router(security_router)
 api_router.include_router(system_router)
 api_router.include_router(settings_router)
+api_router.include_router(chat_router, prefix="/chat", tags=["chat"])

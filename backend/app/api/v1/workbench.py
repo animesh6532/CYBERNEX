@@ -44,8 +44,8 @@ async def create_task(
     db.commit()
     db.refresh(db_task)
 
-    # Initialize execution run
-    run = agent_orchestrator.create_run_for_task(db, db_task)
+    # Initialize execution run asynchronously
+    run = await agent_orchestrator.create_run_for_task(db, db_task)
 
     return {
         "task_id": db_task.id,

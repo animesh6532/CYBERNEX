@@ -10,7 +10,7 @@ from app.core.logging import logger
 
 
 class AgentOrchestrator:
-    def create_run_for_task(self, db: Session, task: models.Task) -> models.Run:
+    async def create_run_for_task(self, db: Session, task: models.Task) -> models.Run:
         """
         Creates and initializes a new LangGraph execution Run for a Task.
         """
@@ -44,8 +44,8 @@ class AgentOrchestrator:
             "step_events": []
         }
 
-        # Invoke LangGraph pipeline
-        final_state = agent_graph.invoke(initial_state)
+        # Invoke LangGraph pipeline asynchronously
+        final_state = await agent_graph.ainvoke(initial_state)
 
         selected_model = final_state.get("model_routed") or task.selected_model
 
@@ -115,4 +115,3 @@ class AgentOrchestrator:
 
 
 agent_orchestrator = AgentOrchestrator()
-
